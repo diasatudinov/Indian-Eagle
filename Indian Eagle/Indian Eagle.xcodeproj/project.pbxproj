@@ -10,22 +10,9 @@
 		2B07FDF32D888C59005743FB /* Indian Eagle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Indian Eagle.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2B07FE052D888C77005743FB /* Exceptions for "Indian Eagle" folder in "Indian Eagle" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Indian-Eagle-Info.plist",
-			);
-			target = 2B07FDF22D888C59005743FB /* Indian Eagle */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2B07FDF52D888C59005743FB /* Indian Eagle */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2B07FE052D888C77005743FB /* Exceptions for "Indian Eagle" folder in "Indian Eagle" target */,
-			);
 			path = "Indian Eagle";
 			sourceTree = "<group>";
 		};
