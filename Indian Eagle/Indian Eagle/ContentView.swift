@@ -118,32 +118,52 @@ class GameScene: SKScene {
             branches.append(branch)
         }
         
-        // Формируем массив птиц: для каждого цвета из birdColors добавляем ровно 4 экземпляра.
+        // Создаем массив птиц: каждая птица встречается 4 раза
         var birdsArray: [UIColor] = []
         for color in birdColors {
             birdsArray.append(contentsOf: Array(repeating: color, count: 4))
         }
         birdsArray.shuffle()
         
-        // Случайно выбираем одну ветку, которая останется пустой (для возможности манёвра).
-        let emptyBranchIndex = Int.random(in: 0..<branchCount)
+        // Определяем количество доступных мест на всех ветках
+        var totalSlots = 0
+        var slotsPerBranch: [Int] = []
+        for _ in branches {
+            let slots = Int.random(in: 2...4)
+            slotsPerBranch.append(slots)
+            totalSlots += slots
+        }
+        
+        // Корректируем количество мест, если оно не совпадает с числом птиц
+        let birdCount = birdsArray.count
+        while totalSlots > birdCount {
+            if let maxIndex = slotsPerBranch.firstIndex(where: { $0 > 2 }) {
+                slotsPerBranch[maxIndex] -= 1
+                totalSlots -= 1
+            }
+        }
+        while totalSlots < birdCount {
+            if let minIndex = slotsPerBranch.firstIndex(where: { $0 < 4 }) {
+                slotsPerBranch[minIndex] += 1
+                totalSlots += 1
+            }
+        }
+        
+        // Распределяем птиц по веткам
         var birdIndex = 0
         for (index, branch) in branches.enumerated() {
-            if index == emptyBranchIndex {
-                continue // оставляем ветку пустой
-            } else {
-                let slots = 4
-                let spacing = branchWidth / CGFloat(slots + 1)
-                for slot in 0..<slots {
-                    if birdIndex < birdsArray.count {
-                        let color = birdsArray[birdIndex]
-                        birdIndex += 1
-                        let bird = SKSpriteNode(color: color, size: birdSize)
-                        let posX = -branchWidth / 2 + spacing * CGFloat(slot + 1)
-                        bird.position = CGPoint(x: posX, y: branchHeight / 2 + birdSize.height / 2)
-                        bird.name = "bird"
-                        branch.addChild(bird)
-                    }
+            let slots = slotsPerBranch[index]
+            let spacing = branchWidth / CGFloat(slots + 1)
+            
+            for slot in 0..<slots {
+                if birdIndex < birdsArray.count {
+                    let color = birdsArray[birdIndex]
+                    birdIndex += 1
+                    let bird = SKSpriteNode(color: color, size: birdSize)
+                    let posX = -branchWidth / 2 + spacing * CGFloat(slot + 1)
+                    bird.position = CGPoint(x: posX, y: branchHeight / 2 + birdSize.height / 2)
+                    bird.name = "bird"
+                    branch.addChild(bird)
                 }
             }
         }
