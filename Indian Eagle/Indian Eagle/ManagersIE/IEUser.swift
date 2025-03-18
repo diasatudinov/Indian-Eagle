@@ -1,36 +1,45 @@
-//
-//  IEUser.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 18.03.2025.
-//
-
-
 import SwiftUI
 
 class IEUser: ObservableObject {
+    
     static let shared = IEUser()
-    @Published var openTournament = false
-    @AppStorage("coins") var storedCoins: Int = 10
-    @Published var coins: Int = 10
     
+    @AppStorage("birds") var storedBirds: Int = 100
+    @Published var birds: Int = 100
+    
+    @AppStorage("stars") var storedStars: Int = 5
+    @Published var stars: Int = 5
     init() {
-        coins = storedCoins
-
+        birds = storedBirds
+        stars = storedStars
     }
     
     
-    func updateUserCoins(for coins: Int) {
-        self.coins += coins
-        storedCoins = self.coins
+    func updateUserBirds(for coins: Int) {
+        self.birds += coins
+        storedBirds = self.birds
     }
     
-    func minusUserCoins(for coins: Int) {
-        self.coins -= coins
-        if self.coins < 0 {
-            self.coins = 0
+    func minusUserBirds(for birds: Int) {
+        self.birds -= birds
+        if self.birds < 0 {
+            self.birds = 0
         }
-        storedCoins = self.coins
+        storedBirds = self.birds
+        
+    }
+    
+    func updateUserStars(for stars: Int) {
+        self.stars += stars
+        storedStars = self.stars
+    }
+    
+    func minusUserStars(for stars: Int) {
+        self.stars -= stars
+        if self.stars < 0 {
+            self.stars = 0
+        }
+        storedStars = self.stars
         
     }
     

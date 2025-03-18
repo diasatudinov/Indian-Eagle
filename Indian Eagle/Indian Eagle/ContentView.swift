@@ -7,7 +7,7 @@ struct ContentView: View {
         let scene = GameScene(size: UIScreen.main.bounds.size)
         scene.scaleMode = .resizeFill
         // Установите уровень сложности: .easy, .medium или .hard
-        scene.difficulty = .medium
+        scene.difficulty = .easy
         return scene
     }
     
@@ -42,9 +42,9 @@ class GameScene: SKScene {
     var movesMade: Int = 0
     
     // Константы для оформления
-    let branchMargin: CGFloat = 10.0     // отступ от края экрана
+    let branchMargin: CGFloat = 10.0
     var branchWidth: CGFloat {
-        return size.width * 0.45          // длина ветки чуть меньше половины экрана
+        return size.width * 0.45
     }
     let branchHeight: CGFloat = 10.0
     let birdSize = CGSize(width: 30, height: 25) // прямоугольные птицы
@@ -401,7 +401,6 @@ class GameScene: SKScene {
     }
     
     // MARK: - Проверка условия победы
-    
     func checkWinCondition() {
         for branch in branches {
             let birds = branch.children.filter { $0.name == "bird" }
@@ -411,7 +410,6 @@ class GameScene: SKScene {
     }
     
     // MARK: - Завершение игры и перезапуск
-    
     func gameOver(victory: Bool) {
         let message = victory ? "Победа!" : "Игра окончена!"
         let label = SKLabelNode(text: message)
