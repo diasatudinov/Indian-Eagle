@@ -94,13 +94,13 @@ class GameScene: SKScene {
         }
         branches.removeAll()
         
-        // Создаём ветки и располагаем их по вертикали
+        // Располагаем ветки по вертикали
         let branchSpacingY = size.height / CGFloat(branchCount + 1)
         for i in 0..<branchCount {
             let branch = SKNode()
             let branchY = branchSpacingY * CGFloat(i + 1)
             
-            // Чередуем расположение: четные – слева, нечетные – справа
+            // Чередуем расположение веток: чётные – слева, нечётные – справа
             if i % 2 == 0 {
                 branch.position = CGPoint(x: branchMargin + branchWidth / 2, y: branchY)
             } else {
@@ -125,42 +125,55 @@ class GameScene: SKScene {
         }
         birdsArray.shuffle()
         
-        // Определяем количество доступных мест на всех ветках
-        var totalSlots = 0
+        // Определяем, сколько птиц будет на каждой ветке (от 2 до 4)
         var slotsPerBranch: [Int] = []
+        var totalSlots = 0
         for _ in branches {
             let slots = Int.random(in: 2...4)
             slotsPerBranch.append(slots)
             totalSlots += slots
         }
         
-        // Корректируем количество мест, если оно не совпадает с числом птиц
+        // Корректируем общее число слотов, чтобы их сумма совпадала с числом птиц
         let birdCount = birdsArray.count
         while totalSlots > birdCount {
-            if let maxIndex = slotsPerBranch.firstIndex(where: { $0 > 2 }) {
-                slotsPerBranch[maxIndex] -= 1
+            if let index = slotsPerBranch.firstIndex(where: { $0 > 2 }) {
+                slotsPerBranch[index] -= 1
                 totalSlots -= 1
             }
         }
         while totalSlots < birdCount {
-            if let minIndex = slotsPerBranch.firstIndex(where: { $0 < 4 }) {
-                slotsPerBranch[minIndex] += 1
+            if let index = slotsPerBranch.firstIndex(where: { $0 < 4 }) {
+                slotsPerBranch[index] += 1
                 totalSlots += 1
             }
         }
         
-        // Распределяем птиц по веткам
+        // Определяем 4 фиксированные позиции на ветке (локальные координаты)
+        let fixedSlots = 4
+        let spacing = branchWidth / CGFloat(fixedSlots + 1)
+        var fixedSlotPositions: [CGFloat] = []
+        for i in 0..<fixedSlots {
+            let posX = -branchWidth / 2 + spacing * CGFloat(i + 1)
+            fixedSlotPositions.append(posX)
+        }
+        
+        // Распределяем птиц по веткам согласно выбранному количеству слотов
         var birdIndex = 0
-        for (index, branch) in branches.enumerated() {
-            let slots = slotsPerBranch[index]
-            let spacing = branchWidth / CGFloat(slots + 1)
+        for (i, branch) in branches.enumerated() {
+            let birdsToPlace = slotsPerBranch[i]
+            // Определяем, с какой стороны находится ветка: для левой – сортируем по возрастанию, для правой – по убыванию
+            let isLeftBranch = branch.position.x < size.width / 2
+            let orderedSlots = isLeftBranch ? fixedSlotPositions.sorted(by: { $0 < $1 })
+                                            : fixedSlotPositions.sorted(by: { $0 > $1 })
             
-            for slot in 0..<slots {
+            // Заполняем выбранное число слотов (от внешнего края к центру)
+            for slot in 0..<birdsToPlace {
                 if birdIndex < birdsArray.count {
                     let color = birdsArray[birdIndex]
                     birdIndex += 1
                     let bird = SKSpriteNode(color: color, size: birdSize)
-                    let posX = -branchWidth / 2 + spacing * CGFloat(slot + 1)
+                    let posX = orderedSlots[slot]
                     bird.position = CGPoint(x: posX, y: branchHeight / 2 + birdSize.height / 2)
                     bird.name = "bird"
                     branch.addChild(bird)
@@ -269,18 +282,20 @@ class GameScene: SKScene {
     // MARK: - Перемещение группы птиц на целевую ветку
     
     func moveBirdGroup(_ birds: [SKSpriteNode], to targetBranch: SKNode) {
-        // Определяем количество свободных слотов в целевой ветке
+        // 1. Определяем 4 фиксированные позиции на ветке (локальная система координат ветки)
         let slots = 4
         let spacing = branchWidth / CGFloat(slots + 1)
-        
-        // Вычисляем позиции слотов (локальные координаты ветки)
         var slotPositions: [CGFloat] = []
         for i in 0..<slots {
             let posX = -branchWidth / 2 + spacing * CGFloat(i + 1)
             slotPositions.append(posX)
         }
         
-        // Определяем число уже занятых слотов
+        // 2. Определяем, с какой стороны расположена ветка относительно центра экрана
+        // Если ветка слева, outer = наименьшее значение, если справа – наибольшее.
+        let isLeftBranch = targetBranch.position.x < size.width / 2
+        
+        // 3. Определяем, какие позиции уже заняты
         let existingBirds = targetBranch.children.filter { $0.name == "bird" } as! [SKSpriteNode]
         let tolerance: CGFloat = 5.0
         var occupiedIndices = Set<Int>()
@@ -294,51 +309,62 @@ class GameScene: SKScene {
             }
         }
         
-        // Если целевая ветка пуста – используем правило: птицы садятся ближе к краю,
-        // в зависимости от того, находится ветка слева или справа.
+        // 4. Выбор позиций для посадки
+        var chosenSlots: [CGFloat] = []
         if existingBirds.isEmpty {
+            // Если ветка пуста, задаём фиксированный порядок заполнения:
+            // для левой ветки – от наименьшего к наибольшему (от края к центру),
+            // для правой – от наибольшего к наименьшему.
+            let orderedSlots: [CGFloat] = isLeftBranch ? slotPositions.sorted(by: { $0 < $1 }) : slotPositions.sorted(by: { $0 > $1 })
             let movingCount = min(birds.count, slots)
-            var chosenSlots: [CGFloat] = []
-            if targetBranch.position.x < size.width / 2 {
-                // левая ветка – выбираем первые слоты (ближе к левому краю)
-                chosenSlots = Array(slotPositions.prefix(movingCount))
-            } else {
-                // правая ветка – выбираем последние слоты (ближе к правому краю)
-                chosenSlots = Array(slotPositions.suffix(movingCount))
+            chosenSlots = Array(orderedSlots.prefix(movingCount))
+        } else {
+            // Если на ветке уже есть птицы, находим свободные позиции
+            var freeSlots: [(index: Int, pos: CGFloat)] = []
+            for (index, pos) in slotPositions.enumerated() {
+                if !occupiedIndices.contains(index) {
+                    freeSlots.append((index, pos))
+                }
             }
-            // Перемещаем столько птиц, сколько свободно слотов
-            for (i, bird) in birds.prefix(movingCount).enumerated() {
-                // Удаляем птицу из исходной ветки (если ещё не удалена)
-                bird.removeFromParent()
-                let newPosition = CGPoint(x: chosenSlots[i], y: branchHeight / 2 + birdSize.height / 2)
-                bird.position = newPosition
-                targetBranch.addChild(bird)
-            }
-            // Если свободен только один слот, то переместится только одна птица из группы
-            checkBranchForFlyAway(targetBranch)
-            return
+            // Сортируем свободные слоты в том же порядке, что и для полной ветки
+            let orderedFreeSlots: [CGFloat] = isLeftBranch ? freeSlots.sorted(by: { $0.pos < $1.pos }).map { $0.pos } : freeSlots.sorted(by: { $0.pos > $1.pos }).map { $0.pos }
+            let movingCount = min(birds.count, orderedFreeSlots.count)
+            chosenSlots = Array(orderedFreeSlots.prefix(movingCount))
         }
         
-        // Если ветка не пуста – ищем свободные слоты и сортируем их по близости к центру (x = 0)
-        var freeSlots: [(index: Int, pos: CGFloat)] = []
-        for (index, pos) in slotPositions.enumerated() {
-            if !occupiedIndices.contains(index) {
-                freeSlots.append((index, pos))
-            }
-        }
-        freeSlots.sort { abs($0.pos) < abs($1.pos) }
-        let freeCount = freeSlots.count
-        let movingCount = min(birds.count, freeCount)
+        // 5. Анимация перелёта
+        let animationDuration = 0.5
+        let movingCount = min(birds.count, chosenSlots.count)
+        var completedMoves = 0
+        
         for i in 0..<movingCount {
-            let newX = freeSlots[i].pos
-            let newPosition = CGPoint(x: newX, y: branchHeight / 2 + birdSize.height / 2)
             let bird = birds[i]
+            // Целевая позиция птицы в локальной системе координат ветки
+            let newLocalPosition = CGPoint(x: chosenSlots[i], y: branchHeight / 2 + birdSize.height / 2)
+            // Переводим её в координаты сцены
+            let finalScenePosition = targetBranch.convert(newLocalPosition, to: self)
+            // Получаем стартовую позицию птицы (в координатах сцены)
+            let startScenePosition = bird.parent?.convert(bird.position, to: self) ?? bird.position
+            
+            // Убираем птицу из исходного родителя и добавляем в сцену для анимации
             bird.removeFromParent()
-            bird.position = newPosition
-            targetBranch.addChild(bird)
+            bird.position = startScenePosition
+            addChild(bird)
+            
+            // Запускаем анимацию перелёта к целевой позиции
+            let moveAction = SKAction.move(to: finalScenePosition, duration: animationDuration)
+            bird.run(moveAction) {
+                // После завершения анимации возвращаем птицу на целевую ветку с нужной локальной позицией
+                bird.removeFromParent()
+                bird.position = newLocalPosition
+                targetBranch.addChild(bird)
+                
+                completedMoves += 1
+                if completedMoves == movingCount {
+                    self.checkBranchForFlyAway(targetBranch)
+                }
+            }
         }
-        
-        checkBranchForFlyAway(targetBranch)
     }
     
     // MARK: - Проверка ветки: если заполнена 4 птицами одного цвета – птицы улетают, а ветка исчезает
