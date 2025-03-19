@@ -8,8 +8,42 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            VStack(spacing: 0) {
+                HStack {
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(.backIconIE)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 70)
+                    }
+                    
+                    Spacer()
+                    
+                    
+                    
+                }
+                Spacer()
+                
+                
+            }.padding()
+            
+        }
+        .background(
+            ZStack {
+                Image(.appBgIE)
+                    .resizable()
+                    .edgesIgnoringSafeArea(.all)
+                    .scaledToFill()
+            }
+            
+        )
+        
     }
 }
 

@@ -91,12 +91,10 @@ struct MenuViewIE: View {
                 ChooseLevelIE()
             }
             .fullScreenCover(isPresented: $showShop) {
-//                ShopV(shopVM: shopVM)
-                
+                SettingsView()
             }
             .fullScreenCover(isPresented: $showSettings) {
-//                SV(settings: settingsVM)
-                
+                SettingsView()
             }
             
         }

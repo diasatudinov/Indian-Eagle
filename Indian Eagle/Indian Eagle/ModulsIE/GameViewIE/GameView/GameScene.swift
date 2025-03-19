@@ -18,6 +18,9 @@ class GameScene: SKScene {
     var difficulty: Difficulty = .easy
     let allBirdNames = ["birdYellow", "birdRed1", "birdRed", "birdPink", "birdOrange", "birdGreen"]
     
+    var winHandler: (() -> Void)?
+    var movesHandler: (() -> Void)?
+    
     // Параметры игры: число веток и набор имен для птиц (используем имена изображений)
     var branchCount: Int = 4
     var birdNames: [String] = [] // вместо birdColors
@@ -298,7 +301,8 @@ class GameScene: SKScene {
                canPlaceBird(on: targetBranch) {
                 moveBirdGroup(selectedBirdGroup, to: targetBranch)
                 if difficulty == .hard {
-//                    movesMade += 1
+                    movesMade += 1
+                    movesHandler?()
 //                    if movesMade >= maxMoves {
 //                        gameOver(victory: false)
 //                        return
@@ -490,7 +494,9 @@ class GameScene: SKScene {
         label.fontColor = .black
         label.position = CGPoint(x: size.width / 2, y: size.height / 2)
         addChild(label)
-        
+        if victory {
+            winHandler?()
+        }
         run(SKAction.sequence([
             SKAction.wait(forDuration: 2.0),
             SKAction.run { [weak self] in self?.restartGame() }

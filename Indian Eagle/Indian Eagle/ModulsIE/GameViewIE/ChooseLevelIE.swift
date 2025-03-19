@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ChooseLevelIE: View {
+    @Environment(\.presentationMode) var presentationMode
+
     @State private var showLevel = false
     @State var difficulty: Difficulty?
     private var difficultyArray: [Difficulty] = [.easy, .hard, .medium]
@@ -15,7 +17,14 @@ struct ChooseLevelIE: View {
         ZStack {
             VStack(spacing: 0) {
                 HStack {
-                    
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(.backIconIE)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 70)
+                    }
                     FLBirdsView()
                     
                     Spacer()
@@ -26,6 +35,7 @@ struct ChooseLevelIE: View {
                 Spacer()
                 HStack {
                     Button {
+                        difficulty = nil
                         DispatchQueue.main.async {
                             difficulty = .easy
                         }
@@ -39,6 +49,7 @@ struct ChooseLevelIE: View {
                     }
                     
                     Button {
+                        difficulty = nil
                         DispatchQueue.main.async {
                             difficulty = .medium
                         }
@@ -51,6 +62,7 @@ struct ChooseLevelIE: View {
                     }
                     
                     Button {
+                        difficulty = nil
                         DispatchQueue.main.async {
                             difficulty = .hard
                         }
