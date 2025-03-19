@@ -1,3 +1,11 @@
+//
+//  RootView.swift
+//  Indian Eagle
+//
+//  Created by Dias Atudinov on 20.03.2025.
+//
+
+
 import SwiftUI
 
 struct RootView: View {
@@ -13,9 +21,9 @@ struct RootView: View {
             } else {
                 VStack {
                     if isLoading {
-                        SplashScreen()
+                       // SplashScreen()
                     } else {
-                        MenuView()
+                        MenuViewIE()
                             .onAppear {
                                 AppDelegate.orientationLock = .landscape
                                 setOrientation(.landscapeRight)

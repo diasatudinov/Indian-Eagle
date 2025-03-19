@@ -1,3 +1,11 @@
+//
+//  Resolver.swift
+//  Indian Eagle
+//
+//  Created by Dias Atudinov on 20.03.2025.
+//
+
+
 import Foundation
 
 class Resolver: NSObject, URLSessionTaskDelegate {
