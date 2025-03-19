@@ -11,7 +11,7 @@ import SwiftUI
 struct Indian_EagleApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(difficulty: .easy)
+            MenuViewIE()
         }
     }
 }

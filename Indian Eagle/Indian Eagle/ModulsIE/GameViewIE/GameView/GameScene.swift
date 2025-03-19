@@ -15,13 +15,12 @@ enum Difficulty {
 // MARK: - Основная игровая сцена
 class GameScene: SKScene {
     
-    
-    
     var difficulty: Difficulty = .easy
+    let allBirdNames = ["birdYellow", "birdRed1", "birdRed", "birdPink", "birdOrange", "birdGreen"]
     
-    // Параметры игры: число веток и набор цветов для птиц
+    // Параметры игры: число веток и набор имен для птиц (используем имена изображений)
     var branchCount: Int = 4
-    var birdColors: [UIColor] = [UIColor.red, UIColor.blue, UIColor.green]
+    var birdNames: [String] = [] // вместо birdColors
     var maxMoves: Int = 0  // Для сложного уровня
     
     // Массив веток (каждая ветка – SKNode)
@@ -39,46 +38,36 @@ class GameScene: SKScene {
         return size.width * 0.45
     }
     let branchHeight: CGFloat = 10.0
-    let birdSize = CGSize(width: 30, height: 25) // прямоугольные птицы
+    let birdSize = CGSize(width: 30, height: 55) // размер картинки птицы
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
         
-        // Настройка параметров сложности и конфигурация веток/цветов по условиям:
+        // Настройка параметров сложности и конфигурация веток/птичек по условиям:
         switch difficulty {
-        case .easy:
-            branchCount = Int.random(in: 4...5)
-            if branchCount == 4 {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green]
-            } else {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.yellow]
+            case .easy:
+                branchCount = Int.random(in: 4...5)
+                maxMoves = 0  // без ограничения ходов
+            case .medium:
+                branchCount = Int.random(in: 5...6)
+                maxMoves = 0
+            case .hard:
+                branchCount = Int.random(in: 6...7)
+                maxMoves = 0
             }
-            maxMoves = 0  // без ограничения ходов
             
-        case .medium:
-            branchCount = Int.random(in: 5...6)
-            if branchCount == 5 {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.yellow]
-            } else {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.yellow, UIColor.purple]
-            }
-            maxMoves = 0
+            // Выбираем количество видов птиц в зависимости от числа веток:
+            // если branchCount == 4 → 3 типа, 5 → 4 типа, 6 → 5 типа, 7 → 6 типа (то есть весь массив)
+            var typesCount = branchCount - 1
+            typesCount = min(typesCount, allBirdNames.count)
             
-        case .hard:
-            branchCount = Int.random(in: 6...7)
-            if branchCount == 6 {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.yellow, UIColor.purple]
-            } else {
-                birdColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.yellow, UIColor.purple, UIColor.orange]
-            }
-            maxMoves = 20
-        }
+            // Перемешиваем массив и выбираем первые typesCount элементов
+            birdNames = Array(allBirdNames.shuffled().prefix(typesCount))
         
         createBranches()
     }
     
     // MARK: - Создание веток и заполнение птицами
-    
     func createBranches() {
         // Удаляем старые ветки, если они существуют
         for branch in branches {
@@ -99,7 +88,7 @@ class GameScene: SKScene {
                 branch.position = CGPoint(x: size.width - (branchMargin + branchWidth / 2), y: branchY)
             }
             
-            // Визуальное представление ветки – коричневая полоска
+            // Визуальное представление ветки – коричневая полоска (оставляем без изменений)
             let branchVisual = SKShapeNode(rectOf: CGSize(width: branchWidth, height: branchHeight))
             branchVisual.fillColor = .brown
             branchVisual.strokeColor = .brown
@@ -110,10 +99,10 @@ class GameScene: SKScene {
             branches.append(branch)
         }
         
-        // Создаем массив птиц: каждая птица встречается 4 раза
-        var birdsArray: [UIColor] = []
-        for color in birdColors {
-            birdsArray.append(contentsOf: Array(repeating: color, count: 4))
+        // Создаем массив птиц: каждая птичка встречается 4 раза
+        var birdsArray: [String] = []
+        for name in birdNames {
+            birdsArray.append(contentsOf: Array(repeating: name, count: 4))
         }
         birdsArray.shuffle()
         
@@ -154,20 +143,33 @@ class GameScene: SKScene {
         var birdIndex = 0
         for (i, branch) in branches.enumerated() {
             let birdsToPlace = slotsPerBranch[i]
-            // Определяем, с какой стороны находится ветка: для левой – сортируем по возрастанию, для правой – по убыванию
+            // Определяем, с какой стороны находится ветка:
+            // для левой – слоты сортируются по возрастанию (от края к центру),
+            // для правой – по убыванию (так, чтобы птицы смотрели в центр)
             let isLeftBranch = branch.position.x < size.width / 2
             let orderedSlots = isLeftBranch ? fixedSlotPositions.sorted(by: { $0 < $1 })
                                             : fixedSlotPositions.sorted(by: { $0 > $1 })
             
-            // Заполняем выбранное число слотов (от внешнего края к центру)
             for slot in 0..<birdsToPlace {
                 if birdIndex < birdsArray.count {
-                    let color = birdsArray[birdIndex]
+                    let imageName = birdsArray[birdIndex]
                     birdIndex += 1
-                    let bird = SKSpriteNode(color: color, size: birdSize)
+                    // Создаем SKSpriteNode с изображением птички
+                    let bird = SKSpriteNode(imageNamed: imageName)
+                    bird.size = birdSize
                     let posX = orderedSlots[slot]
+                    // Размещаем птицу так, чтобы нижняя часть была за веткой (имитация сидения)
                     bird.position = CGPoint(x: posX, y: branchHeight / 2 + birdSize.height / 2)
                     bird.name = "bird"
+                    // Сохраняем тип птицы для логики игры
+                    bird.userData = NSMutableDictionary()
+                    bird.userData?["birdType"] = imageName
+                    // Если ветка справа, переворачиваем птичку, чтобы она смотрела в центр
+                    if !isLeftBranch {
+                        bird.xScale = -abs(bird.xScale)
+                    } else {
+                        bird.xScale = abs(bird.xScale)
+                    }
                     branch.addChild(bird)
                 }
             }
@@ -175,29 +177,28 @@ class GameScene: SKScene {
     }
     
     // MARK: - Выбор группы птиц для перемещения
-    
-    /// Если нажата крайняя птица, возвращает группу подряд идущих птиц того же цвета.
+    /// Если нажата крайняя птичка, возвращает группу подряд идущих птиц того же типа.
     func getMovableGroup(for bird: SKSpriteNode, in branch: SKNode) -> [SKSpriteNode]? {
         let birds = branch.children.filter { $0.name == "bird" } as! [SKSpriteNode]
         let sortedBirds = birds.sorted { $0.position.x < $1.position.x }
-        guard let firstBird = sortedBirds.first, let lastBird = sortedBirds.last else { return nil }
+        guard let _ = sortedBirds.first, let _ = sortedBirds.last else { return nil }
         
-        if bird == firstBird {
-            // Если нажата самая левая, выбираем подряд идущие птицы от начала
+        guard let tappedType = bird.userData?["birdType"] as? String else { return nil }
+        
+        if bird == sortedBirds.first {
             var group: [SKSpriteNode] = []
             for b in sortedBirds {
-                if b.color == bird.color {
+                if let type = b.userData?["birdType"] as? String, type == tappedType {
                     group.append(b)
                 } else {
                     break
                 }
             }
             return group
-        } else if bird == lastBird {
-            // Если нажата самая правая, выбираем подряд идущие птицы с конца
+        } else if bird == sortedBirds.last {
             var group: [SKSpriteNode] = []
             for b in sortedBirds.reversed() {
-                if b.color == bird.color {
+                if let type = b.userData?["birdType"] as? String, type == tappedType {
                     group.append(b)
                 } else {
                     break
@@ -209,7 +210,6 @@ class GameScene: SKScene {
     }
     
     // MARK: - Обработка касаний
-    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
@@ -272,7 +272,6 @@ class GameScene: SKScene {
     }
     
     // MARK: - Перемещение группы птиц на целевую ветку
-    
     func moveBirdGroup(_ birds: [SKSpriteNode], to targetBranch: SKNode) {
         // 1. Определяем 4 фиксированные позиции на ветке (локальная система координат ветки)
         let slots = 4
@@ -304,21 +303,16 @@ class GameScene: SKScene {
         // 4. Выбор позиций для посадки
         var chosenSlots: [CGFloat] = []
         if existingBirds.isEmpty {
-            // Если ветка пуста, задаём фиксированный порядок заполнения:
-            // для левой ветки – от наименьшего к наибольшему (от края к центру),
-            // для правой – от наибольшего к наименьшему.
             let orderedSlots: [CGFloat] = isLeftBranch ? slotPositions.sorted(by: { $0 < $1 }) : slotPositions.sorted(by: { $0 > $1 })
             let movingCount = min(birds.count, slots)
             chosenSlots = Array(orderedSlots.prefix(movingCount))
         } else {
-            // Если на ветке уже есть птицы, находим свободные позиции
             var freeSlots: [(index: Int, pos: CGFloat)] = []
             for (index, pos) in slotPositions.enumerated() {
                 if !occupiedIndices.contains(index) {
                     freeSlots.append((index, pos))
                 }
             }
-            // Сортируем свободные слоты в том же порядке, что и для полной ветки
             let orderedFreeSlots: [CGFloat] = isLeftBranch ? freeSlots.sorted(by: { $0.pos < $1.pos }).map { $0.pos } : freeSlots.sorted(by: { $0.pos > $1.pos }).map { $0.pos }
             let movingCount = min(birds.count, orderedFreeSlots.count)
             chosenSlots = Array(orderedFreeSlots.prefix(movingCount))
@@ -346,7 +340,6 @@ class GameScene: SKScene {
             // Запускаем анимацию перелёта к целевой позиции
             let moveAction = SKAction.move(to: finalScenePosition, duration: animationDuration)
             bird.run(moveAction) {
-                // После завершения анимации возвращаем птицу на целевую ветку с нужной локальной позицией
                 bird.removeFromParent()
                 bird.position = newLocalPosition
                 targetBranch.addChild(bird)
@@ -359,13 +352,12 @@ class GameScene: SKScene {
         }
     }
     
-    // MARK: - Проверка ветки: если заполнена 4 птицами одного цвета – птицы улетают, а ветка исчезает
-    
+    // MARK: - Проверка ветки: если заполнена 4 птицами одного типа – птицы улетают, а ветка исчезает
     func checkBranchForFlyAway(_ branch: SKNode) {
         let birds = branch.children.filter { $0.name == "bird" } as! [SKSpriteNode]
-        guard birds.count == 4, let firstColor = birds.first?.color else { return }
+        guard birds.count == 4, let firstType = birds.first?.userData?["birdType"] as? String else { return }
         for bird in birds {
-            if bird.color != firstColor {
+            if let type = bird.userData?["birdType"] as? String, type != firstType {
                 return
             }
         }

@@ -9,20 +9,62 @@ import SwiftUI
 import SpriteKit
 
 struct BirdsGameView: View {
+    @Environment(\.presentationMode) var presentationMode
+
     @State var difficulty: Difficulty
+    @State private var isPause = false
+
     var scene: SKScene {
-        // Создаём сцену, можно менять размер, масштаб и уровень сложности
         let scene = GameScene(size: UIScreen.main.bounds.size)
         scene.scaleMode = .resizeFill
-        // Установите уровень сложности: .easy, .medium или .hard
         scene.difficulty = difficulty
         return scene
     }
     
     var body: some View {
         ZStack {
-            SpriteView(scene: scene)
-                .ignoresSafeArea()
+            VStack {
+                Spacer()
+                SpriteViewContainer(scene: scene)
+                    .ignoresSafeArea()
+            }
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    
+                    Button {
+                        isPause = true
+                    } label: {
+                        Image(.pauseIconIE)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 50)
+                    }
+                }
+                
+            }
+            
+            if isPause {
+                ZStack {
+                    
+                        
+                    VStack {
+                        Button {
+                            isPause = false
+                        } label: {
+                           Text("RESUME")
+                        }
+                        
+                        Button {
+                            presentationMode.wrappedValue.dismiss()
+                        } label: {
+                            Text("MENU")
+                        }
+                    }
+                }.frame(height: 262)
+            }
+            
         }.background(
             ZStack {
                 Image(.appBgIE)

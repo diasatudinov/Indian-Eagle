@@ -88,7 +88,7 @@ struct MenuViewIE: View {
 //                }
 //            }
             .fullScreenCover(isPresented: $showAIGame) {
-//                GameView(shopVM: shopVM, opponentState: .ai)
+                ChooseLevelIE()
             }
             .fullScreenCover(isPresented: $showShop) {
 //                ShopV(shopVM: shopVM)
