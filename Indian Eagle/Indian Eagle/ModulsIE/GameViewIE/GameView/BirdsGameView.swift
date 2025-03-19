@@ -6,13 +6,35 @@
 //
 
 import SwiftUI
+import SpriteKit
 
 struct BirdsGameView: View {
+    @State var difficulty: Difficulty
+    var scene: SKScene {
+        // Создаём сцену, можно менять размер, масштаб и уровень сложности
+        let scene = GameScene(size: UIScreen.main.bounds.size)
+        scene.scaleMode = .resizeFill
+        // Установите уровень сложности: .easy, .medium или .hard
+        scene.difficulty = difficulty
+        return scene
+    }
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            SpriteView(scene: scene)
+                .ignoresSafeArea()
+        }.background(
+            ZStack {
+                Image(.appBgIE)
+                    .resizable()
+                    .edgesIgnoringSafeArea(.all)
+                    .scaledToFill()
+            }
+            
+        )
     }
 }
 
 #Preview {
-    BirdsGameView()
+    BirdsGameView(difficulty: .easy)
 }

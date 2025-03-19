@@ -42,7 +42,7 @@ class GameScene: SKScene {
     let birdSize = CGSize(width: 30, height: 25) // прямоугольные птицы
     
     override func didMove(to view: SKView) {
-        backgroundColor = .white
+        backgroundColor = .clear
         
         // Настройка параметров сложности и конфигурация веток/цветов по условиям:
         switch difficulty {

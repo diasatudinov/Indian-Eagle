@@ -8,8 +8,95 @@
 import SwiftUI
 
 struct ChooseLevelIE: View {
+    @State private var showLevel = false
+    @State var difficulty: Difficulty?
+    private var difficultyArray: [Difficulty] = [.easy, .hard, .medium]
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            VStack(spacing: 0) {
+                HStack {
+                    
+                    FLBirdsView()
+                    
+                    Spacer()
+                    
+                    IEStarsView()
+                    
+                }
+                Spacer()
+                HStack {
+                    Button {
+                        DispatchQueue.main.async {
+                            difficulty = .easy
+                        }
+                            showLevel = true
+                        
+                    } label: {
+                        Image(.easyIcon)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    }
+                    
+                    Button {
+                        DispatchQueue.main.async {
+                            difficulty = .medium
+                        }
+                        showLevel = true
+                    } label: {
+                        Image(.mediumIcaon)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    }
+                    
+                    Button {
+                        DispatchQueue.main.async {
+                            difficulty = .hard
+                        }
+                        showLevel = true
+                    } label: {
+                        Image(.hardIcon)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    }
+                    
+                    Button {
+                        DispatchQueue.main.async {
+                            difficulty = difficultyArray.randomElement()
+                        }
+                        showLevel = true
+                    } label: {
+                        Image(.randomLevelIcon)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    }
+                }
+                
+                
+                Spacer()
+                
+                
+            }.padding()
+            
+        }
+        .background(
+            ZStack {
+                Image(.appBgIE)
+                    .resizable()
+                    .edgesIgnoringSafeArea(.all)
+                    .scaledToFill()
+            }
+            
+        )
+        .fullScreenCover(isPresented: $showLevel) {
+            if let difficulty = difficulty {
+                BirdsGameView(difficulty: difficulty)
+            }
+        }
+        
     }
 }
 
