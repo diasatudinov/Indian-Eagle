@@ -1,14 +1,25 @@
+//
+//  SVM.swift
+//  Indian Eagle
+//
+//  Created by Dias Atudinov on 19.03.2025.
+//
+
+
 import SwiftUI
 
 class SVM: ObservableObject {
-    @Published var shopItems: [Item] = [
-        Item(name: "Creators of beauty", images: ["inst1", "inst2", "inst3", "instEmpty", "inst4","inst5", "inst6", "inst7"]),
-        Item(name: "Musical heaven", images: ["music1", "music2", "music3", "musicEmpty", "music4","music5", "music6", "music7"]),
-        Item(name: "World classic", images: ["genre1", "genre2", "genre3", "genreEmpty", "genre4","genre5", "genre6", "genre7"]),
+    @Published var shopTeamItems: [Item] = [
+        Item(type: .team, name: "Team Ordinary", images: ["birdYellow", "birdRed1","birdRed","birdPink","birdOrange","birdGreen"])
 
     ]
     
-    @Published var currentItem: Item? {
+    @Published var shopSetItems: [Item] = [
+        Item(type: .set, name: "Ordinary Set", images: [])
+
+    ]
+    
+    @Published var currentTeamItem: Item? {
         didSet {
             saveTeam()
         }
@@ -20,16 +31,16 @@ class SVM: ObservableObject {
     
     private let userDefaultsTeamKey = "boughtItem"
     
-    func getRandomItem() -> [String] {
-        if let currentItem = currentItem {
-            let availableItems = shopItems.filter { $0.name != currentItem.name }
-            return availableItems.randomElement()?.images ?? []
-        }
-        return []
-    }
+//    func getRandomItem() -> [String] {
+//        if let currentItem = currentItem {
+//            let availableItems = shopTeamItems.filter { $0.name != currentItem.name }
+//            return availableItems.randomElement()?.images ?? []
+//        }
+//        return []
+//    }
     
     func saveTeam() {
-        if let currentItem = currentItem {
+        if let currentItem = currentTeamItem {
             if let encodedData = try? JSONEncoder().encode(currentItem) {
                 UserDefaults.standard.set(encodedData, forKey: userDefaultsTeamKey)
             }
@@ -39,17 +50,21 @@ class SVM: ObservableObject {
     func loadTeam() {
         if let savedData = UserDefaults.standard.data(forKey: userDefaultsTeamKey),
            let loadedItem = try? JSONDecoder().decode(Item.self, from: savedData) {
-            currentItem = loadedItem
+            currentTeamItem = loadedItem
         } else {
-            currentItem = shopItems[0]
+            currentTeamItem = shopTeamItems[0]
             print("No saved data found")
         }
     }
     
 }
 
+enum ItemType: Codable, Hashable {
+    case set, team
+}
 struct Item: Codable, Hashable {
     var id = UUID()
+    var type: ItemType
     var name: String
     var images: [String]
 }
