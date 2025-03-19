@@ -78,5 +78,5 @@ struct BirdsGameView: View {
 }
 
 #Preview {
-    BirdsGameView(difficulty: .easy)
+    BirdsGameView(difficulty: .hard)
 }
