@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct MenuViewIE: View {
-    @State private var showAIGame = false
+    @State private var showGame = false
     @State private var showShop = false
     @State private var showSettings = false
     
 //    @StateObject var shopVM = SVM()
-//    @StateObject var settingsVM = SM()
+    @StateObject var settingsVM = SettingsViewModelIE()
     
     var body: some View {
         
@@ -33,7 +33,7 @@ struct MenuViewIE: View {
                     
                     HStack {
                         Button {
-                            showAIGame = true
+                            showGame = true
                         } label: {
                             Image(.playIconIE)
                                 .resizable()
@@ -87,14 +87,14 @@ struct MenuViewIE: View {
 //                    MusicPlayer.shared.stopBackgroundMusic()
 //                }
 //            }
-            .fullScreenCover(isPresented: $showAIGame) {
+            .fullScreenCover(isPresented: $showGame) {
                 ChooseLevelIE()
             }
             .fullScreenCover(isPresented: $showShop) {
-                SettingsView()
+
             }
             .fullScreenCover(isPresented: $showSettings) {
-                SettingsView()
+                SettingsView(settings: settingsVM)
             }
             
         }
