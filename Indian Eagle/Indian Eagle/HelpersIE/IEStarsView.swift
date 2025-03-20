@@ -1,11 +1,3 @@
-//
-//  FLBirdsView.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 18.03.2025.
-//
-
-
 import SwiftUI
 
 struct IEStarsView: View {

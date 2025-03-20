@@ -1,18 +1,12 @@
-//
-//  ChooseLevelIE.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 19.03.2025.
-//
-
 import SwiftUI
 
 struct ChooseLevelIE: View {
+    @ObservedObject var shopVM: ShopViewModelIE
     @Environment(\.presentationMode) var presentationMode
-
     @State private var showLevel = false
+    
     @State var difficulty: Difficulty?
-    private var difficultyArray: [Difficulty] = [.easy, .hard, .medium]
+    var difficultyArray: [Difficulty] = [.easy, .hard, .medium]
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -23,7 +17,7 @@ struct ChooseLevelIE: View {
                         Image(.backIconIE)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 70)
+                            .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 140:70)
                     }
                     FLBirdsView()
                     
@@ -96,7 +90,7 @@ struct ChooseLevelIE: View {
         }
         .background(
             ZStack {
-                Image(.appBgIE)
+                Image(shopVM.currentSetItem?.images.first ?? "")
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
                     .scaledToFill()
@@ -105,7 +99,7 @@ struct ChooseLevelIE: View {
         )
         .fullScreenCover(isPresented: $showLevel) {
             if let difficulty = difficulty {
-                BirdsGameView(difficulty: difficulty)
+                BirdsGameView(shopVM: shopVM, difficulty: difficulty)
             }
         }
         
@@ -113,5 +107,5 @@ struct ChooseLevelIE: View {
 }
 
 #Preview {
-    ChooseLevelIE()
+    ChooseLevelIE(shopVM: ShopViewModelIE())
 }
