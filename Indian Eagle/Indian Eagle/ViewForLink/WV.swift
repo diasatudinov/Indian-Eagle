@@ -1,11 +1,3 @@
-//
-//  WV.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 20.03.2025.
-//
-
-
 import SwiftUI
 import WebKit
 

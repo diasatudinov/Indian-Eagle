@@ -1,11 +1,3 @@
-//
-//  SongsManager.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 20.03.2025.
-//
-
-
 import AVFoundation
 
 class MusicManagerIE {

@@ -1,11 +1,3 @@
-//
-//  Resolver.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 20.03.2025.
-//
-
-
 import Foundation
 
 class Resolver: NSObject, URLSessionTaskDelegate {
@@ -22,7 +14,6 @@ class Resolver: NSObject, URLSessionTaskDelegate {
             }
             
             if let httpResponse = response as? HTTPURLResponse {
-                print("httpResponse: \(httpResponse.statusCode)")
                 let result = (400...599).contains(httpResponse.statusCode)
                 completion(result)
             } else {
