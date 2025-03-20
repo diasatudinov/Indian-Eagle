@@ -1,10 +1,3 @@
-//
-//  SettingsView.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 19.03.2025.
-//
-
 import SwiftUI
 
 struct SettingsView: View {
@@ -14,22 +7,7 @@ struct SettingsView: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                HStack {
-                    Button {
-                        presentationMode.wrappedValue.dismiss()
-                    } label: {
-                        Image(.backIconIE)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 140:70)
-                    }
-                    
-                    Spacer()
-                }
-                Spacer()
-            }.padding()
-            
+                        
             VStack {
                 ZStack {
                     Image(.settingsBgIE)
@@ -57,12 +35,12 @@ struct SettingsView: View {
                                             Image(.onIE)
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 65:50)
+                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                                         } else {
                                             Image(.offIE)
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 65:50)
+                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                                         }
                                     }
                                 }
@@ -81,17 +59,18 @@ struct SettingsView: View {
                                         .foregroundStyle(.appBrown)
                                     Button {
                                         settings.musicEnabled.toggle()
+                                        
                                     } label: {
                                         if settings.musicEnabled {
                                             Image(.onIE)
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 65:50)
+                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                                         } else {
                                             Image(.offIE)
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 65:50)
+                                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                                         }
                                     }
                                 }
@@ -129,6 +108,23 @@ struct SettingsView: View {
                     }
                 }
             }
+            
+            VStack(spacing: 0) {
+                HStack {
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        Image(.backIconIE)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 140:70)
+                    }
+                    
+                    Spacer()
+                }
+                Spacer()
+            }.padding()
+
         }
         .background(
             ZStack {
