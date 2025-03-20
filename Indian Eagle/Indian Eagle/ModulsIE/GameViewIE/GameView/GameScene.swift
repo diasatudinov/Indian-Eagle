@@ -1,11 +1,3 @@
-//
-//  Difficulty.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 19.03.2025.
-//
-
-
 import SpriteKit
 
 enum Difficulty {
@@ -15,8 +7,9 @@ enum Difficulty {
 // MARK: - Основная игровая сцена
 class GameScene: SKScene {
     
+    let settingsVM = SettingsViewModelIE()
     var difficulty: Difficulty = .easy
-    let allBirdNames = ["birdYellow", "birdRed1", "birdRed", "birdPink", "birdOrange", "birdGreen"]
+    var allBirdNames = ["birdYellow", "birdRed1", "birdRed", "birdPink", "birdOrange", "birdGreen"]
     
     var winHandler: (() -> Void)?
     var movesHandler: (() -> Void)?
@@ -41,7 +34,9 @@ class GameScene: SKScene {
         return size.width * 0.45
     }
     let branchHeight: CGFloat = 10.0
-    let birdSize = CGSize(width: 30, height: 55) // размер картинки птицы
+    let birdSize = CGSize(width: DeviceInfoIE.shared.deviceType == .pad ? 60:30, height: DeviceInfoIE.shared.deviceType == .pad ? 110:55) // размер картинки птицы
+    
+    let birdFlapSound = SKAction.playSoundFileNamed("birdWingsIE.mp3", waitForCompletion: false)
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
@@ -393,6 +388,7 @@ class GameScene: SKScene {
         let movingCount = min(birds.count, chosenSlots.count)
         var completedMoves = 0
         
+        
         for i in 0..<movingCount {
             let bird = birds[i]
             // Целевая позиция в локальной системе координат ветки
@@ -412,6 +408,9 @@ class GameScene: SKScene {
             addChild(bird)
             
             let moveAction = SKAction.move(to: finalScenePosition, duration: animationDuration)
+            if settingsVM.soundEnabled {
+                bird.run(birdFlapSound)
+            }
             bird.run(moveAction) {
                 // После анимации возвращаем птицу на целевую ветку
                 bird.removeFromParent()

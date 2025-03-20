@@ -1,16 +1,9 @@
-//
-//  BirdsGameView.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 19.03.2025.
-//
-
 import SwiftUI
 import SpriteKit
 
 struct BirdsGameView: View {
     @Environment(\.presentationMode) var presentationMode
-
+    @ObservedObject var shopVM: ShopViewModelIE
     @State var difficulty: Difficulty
     @State private var isPause = false
     @State private var isGameLose = false
@@ -27,8 +20,10 @@ struct BirdsGameView: View {
         ZStack {
             VStack {
                 Spacer()
-                SpriteViewContainer(scene: gameScene, gameWin: $isGameWin, moves: $moves, difficulty: difficulty)
-                    .ignoresSafeArea()
+                if let currentTeamItems = shopVM.currentTeamItem {
+                    SpriteViewContainer(scene: gameScene, gameWin: $isGameWin, moves: $moves, difficulty: difficulty, birds: currentTeamItems.images)
+                        .ignoresSafeArea()
+                }
             }
             VStack {
                 Spacer()
@@ -44,12 +39,12 @@ struct BirdsGameView: View {
                             HStack {
                                 Spacer()
                                 Text("\(moves)")
-                                    .font(.system(size: 15, weight: .bold))
+                                    .font(.system(size: DeviceInfoIE.shared.deviceType == .pad ? 30:15, weight: .bold))
                                     .foregroundStyle(.appBrown)
-                            }.padding(8)
+                            }.padding(DeviceInfoIE.shared.deviceType == .pad ? 16:8)
                             Spacer()
                         }
-                    }.frame(width: 70, height: 70)
+                    }.frame(width: DeviceInfoIE.shared.deviceType == .pad ? 140:70, height: DeviceInfoIE.shared.deviceType == .pad ? 140:70)
                     
                     
                     Button {
@@ -59,7 +54,7 @@ struct BirdsGameView: View {
                         Image(.pauseIconIE)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 50)
+                            .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                     }
                 }
                 
@@ -81,7 +76,7 @@ struct BirdsGameView: View {
                                 Image(.closeIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 80)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 160:80)
                             }
                         }
                         Spacer()
@@ -94,18 +89,18 @@ struct BirdsGameView: View {
                             Image(.homeIconBtn)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 100)
+                                .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 200:100)
                         }
                         
                        
-                        HStack(spacing: 30) {
+                        HStack(spacing: DeviceInfoIE.shared.deviceType == .pad ? 60:30) {
                             Button {
                                 restartGame()
                             } label: {
                                 Image(.restartLevelIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 80)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 160:80)
                             }
                             
                             Button {
@@ -114,11 +109,11 @@ struct BirdsGameView: View {
                                 Image(.restartIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 80)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 160:80)
                             }
                         }
                     }
-                }.frame(width: 320, height: 262)
+                }.frame(width: DeviceInfoIE.shared.deviceType == .pad ? 640:320, height: DeviceInfoIE.shared.deviceType == .pad ? 524:262)
             }
             
             if isGameLose {
@@ -131,7 +126,7 @@ struct BirdsGameView: View {
                         
                         
                        
-                        HStack(spacing: 30) {
+                        HStack(spacing: DeviceInfoIE.shared.deviceType == .pad ? 60:30) {
                             Button {
                                 presentationMode.wrappedValue.dismiss()
                                 
@@ -139,7 +134,7 @@ struct BirdsGameView: View {
                                 Image(.homeIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 100)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 200:100)
                             }
                             
                             Button {
@@ -148,11 +143,11 @@ struct BirdsGameView: View {
                                 Image(.restartIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 80)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 160:80)
                             }
                         }
-                    }.padding(.top, 70)
-                }.frame(height: 362)
+                    }.padding(.top, DeviceInfoIE.shared.deviceType == .pad ? 140:70)
+                }.frame(height: DeviceInfoIE.shared.deviceType == .pad ? 724:362)
             }
             
             if isGameWin {
@@ -170,9 +165,9 @@ struct BirdsGameView: View {
                         Image(.bonusesIconIE)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 50)
+                            .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 100:50)
                        
-                        HStack(spacing: 30) {
+                        HStack(spacing: DeviceInfoIE.shared.deviceType == .pad ? 60:30) {
                             Button {
                                 presentationMode.wrappedValue.dismiss()
                                 
@@ -180,7 +175,7 @@ struct BirdsGameView: View {
                                 Image(.homeIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 100)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 200:100)
                             }
                             
                             Button {
@@ -189,17 +184,17 @@ struct BirdsGameView: View {
                                 Image(.nextGameIconBtn)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 80)
+                                    .frame(height: DeviceInfoIE.shared.deviceType == .pad ? 160:80)
                             }
                         }
-                    }.padding(.top, 70)
-                }.frame(height: 362)
+                    }.padding(.top, DeviceInfoIE.shared.deviceType == .pad ? 140:70)
+                }.frame(height: DeviceInfoIE.shared.deviceType == .pad ? 724:362)
             }
             }
             
         }.background(
             ZStack {
-                Image(.appBgIE)
+                Image(shopVM.currentSetItem?.images.first ?? "")
                     .resizable()
                     .edgesIgnoringSafeArea(.all)
                     .scaledToFill()
@@ -219,5 +214,5 @@ struct BirdsGameView: View {
 }
 
 #Preview {
-    BirdsGameView(difficulty: .hard)
+    BirdsGameView(shopVM: ShopViewModelIE(), difficulty: .hard)
 }

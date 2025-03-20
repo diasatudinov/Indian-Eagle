@@ -1,11 +1,3 @@
-//
-//  RootView.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 20.03.2025.
-//
-
-
 import SwiftUI
 
 struct RootView: View {
@@ -21,7 +13,7 @@ struct RootView: View {
             } else {
                 VStack {
                     if isLoading {
-                       // SplashScreen()
+                       SplashScreenIE()
                     } else {
                         MenuViewIE()
                             .onAppear {

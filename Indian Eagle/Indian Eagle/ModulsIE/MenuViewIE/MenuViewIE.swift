@@ -1,10 +1,3 @@
-//
-//  MenuViewIE.swift
-//  Indian Eagle
-//
-//  Created by Dias Atudinov on 18.03.2025.
-//
-
 import SwiftUI
 
 struct MenuViewIE: View {
@@ -12,7 +5,7 @@ struct MenuViewIE: View {
     @State private var showShop = false
     @State private var showSettings = false
     
-//    @StateObject var shopVM = SVM()
+    @StateObject var shopVM = ShopViewModelIE()
     @StateObject var settingsVM = SettingsViewModelIE()
     
     var body: some View {
@@ -75,23 +68,23 @@ struct MenuViewIE: View {
                 }
                 
             )
-//            .onAppear {
-//                if settingsVM.musicEnabled {
-//                    MusicPlayer.shared.playBackgroundMusic()
-//                }
-//            }
-//            .onChange(of: settingsVM.musicEnabled) { enabled in
-//                if enabled {
-//                    MusicPlayer.shared.playBackgroundMusic()
-//                } else {
-//                    MusicPlayer.shared.stopBackgroundMusic()
-//                }
-//            }
+            .onAppear {
+                if settingsVM.musicEnabled {
+                    MusicManagerIE.shared.playBackgroundMusic()
+                }
+            }
+            .onChange(of: settingsVM.musicEnabled) { enabled in
+                if enabled {
+                    MusicManagerIE.shared.playBackgroundMusic()
+                } else {
+                    MusicManagerIE.shared.stopBackgroundMusic()
+                }
+            }
             .fullScreenCover(isPresented: $showGame) {
-                ChooseLevelIE()
+                ChooseLevelIE(shopVM: shopVM)
             }
             .fullScreenCover(isPresented: $showShop) {
-
+                ShopViewIE(viewModel: shopVM)
             }
             .fullScreenCover(isPresented: $showSettings) {
                 SettingsView(settings: settingsVM)
